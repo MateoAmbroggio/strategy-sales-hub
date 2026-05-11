@@ -29,6 +29,10 @@ button{font-family:'Inter',sans-serif;cursor:pointer} a{text-decoration:none}
 
 .landing-nav{width:100%;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
 .landing-nav img{height:26px;display:block}
+.lang-selector{display:flex;gap:4px;align-items:center}
+.lang-btn{background:transparent;border:1px solid var(--border);color:var(--text3);font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .2s}
+.lang-btn:hover{border-color:var(--orange);color:var(--orange)}
+.lang-btn.active{background:var(--orange);border-color:var(--orange);color:#fff}
 .nav-label{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text4)}
 
 .landing-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px 40px;text-align:center;width:100%}
@@ -217,14 +221,21 @@ button{font-family:'Inter',sans-serif;cursor:pointer} a{text-decoration:none}
 <div id="landing" class="view active">
   <nav class="landing-nav">
     <img id="logo-landing" src="" alt="Strategy">
-    <div class="nav-label">Sales Hub</div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div class="nav-label">Sales Hub</div>
+      <div class="lang-selector">
+        <button class="lang-btn active" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('pt')">PT</button>
+      </div>
+    </div>
   </nav>
   <div class="landing-hero">
-    <div class="landing-eyebrow">● Repositorio de Ventas</div>
-    <h1 class="landing-title">Casos de uso<br>por <span>industria</span></h1>
-    <p class="landing-sub">Seleccioná un sector para acceder rápidamente a los casos de uso y materiales de Strategy.</p>
+    <div id="landing-eyebrow" class="landing-eyebrow">● Repositorio de Ventas</div>
+    <h1 id="landing-title" class="landing-title">Casos de uso<br>por <span>industria</span></h1>
+    <p id="landing-sub" class="landing-sub">Seleccioná un sector para acceder rápidamente a los casos de uso y materiales de Strategy.</p>
     <div class="sector-grid">
-      <div class="sector-card" onclick="goSector('fsi')">
+      <div id="sector-card-fsi" class="sector-card" onclick="goSector('fsi')">
         <div class="sector-card-stripe" style="background:linear-gradient(90deg,#4d8aff,#a57cff)"></div>
         <span class="sector-icon">🏦</span>
         <div class="sector-name">Financial Services</div>
@@ -232,7 +243,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer} a{text-decoration:none}
         <div class="sector-count"><span>9</span> recursos disponibles</div>
         <div class="sector-arrow">→</div>
       </div>
-      <div class="sector-card" onclick="goSector('retail')">
+      <div id="sector-card-retail" class="sector-card" onclick="goSector('retail')">
         <div class="sector-card-stripe" style="background:linear-gradient(90deg,#f26522,#ffc94d)"></div>
         <span class="sector-icon">🛒</span>
         <div class="sector-name">Retail</div>
@@ -242,7 +253,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer} a{text-decoration:none}
       </div>
     </div>
   </div>
-  <div class="landing-footer">Strategy Sales Hub · Uso interno · No distribuir externamente</div>
+  <div id="landing-footer" class="landing-footer">Strategy Sales Hub · Uso interno · No distribuir externamente</div>
 </div>
 
 <!-- ════════════════════════════════
@@ -395,8 +406,179 @@ const ITEMS = [
     ]}
 ];
 
+// ══ I18N ══
+var LANG = 'es';
+var I18N = {
+  es: {
+    eyebrow: '● Repositorio de Ventas',
+    title: 'Casos de uso<br>por <span>industria</span>',
+    sub: 'Seleccioná un sector para acceder rápidamente a los casos de uso y materiales de Strategy.',
+    footer: 'Strategy Sales Hub · Uso interno · No distribuir externamente',
+    recursos: 'recursos disponibles',
+    sectors: {
+      fsi: {
+        name: 'Financial Services',
+        desc: 'Banca, seguros, mercados de capital y fintech. Analytics, AML, Customer 360 y más.'
+      },
+      retail: {
+        name: 'Retail',
+        desc: 'Supermercados, electrodomésticos y omnicanal. Agent 2.0, performance de ventas y margen.'
+      }
+    }
+  },
+  en: {
+    eyebrow: '● Sales Repository',
+    title: 'Use cases<br>by <span>industry</span>',
+    sub: 'Select a sector to quickly access Strategy use cases and sales materials.',
+    footer: 'Strategy Sales Hub · Internal use only · Do not distribute externally',
+    recursos: 'resources available',
+    sectors: {
+      fsi: {
+        name: 'Financial Services',
+        desc: 'Banking, insurance, capital markets and fintech. Analytics, AML, Customer 360 and more.'
+      },
+      retail: {
+        name: 'Retail',
+        desc: 'Supermarkets, electronics and omnichannel. Agent 2.0, sales performance and margin.'
+      }
+    }
+  },
+  pt: {
+    eyebrow: '● Repositório de Vendas',
+    title: 'Casos de uso<br>por <span>setor</span>',
+    sub: 'Selecione um setor para acessar rapidamente os casos de uso e materiais da Strategy.',
+    footer: 'Strategy Sales Hub · Uso interno · Não distribuir externamente',
+    recursos: 'recursos disponíveis',
+    sectors: {
+      fsi: {
+        name: 'Serviços Financeiros',
+        desc: 'Bancos, seguros, mercados de capital e fintech. Analytics, AML, Customer 360 e mais.'
+      },
+      retail: {
+        name: 'Varejo',
+        desc: 'Supermercados, eletrodomésticos e omnichannel. Agent 2.0, performance de vendas e margem.'
+      }
+    }
+  }
+};
+
+function setLang(l) {
+  LANG = l;
+  var t = I18N[l];
+  // update lang buttons
+  var btns = document.querySelectorAll('.lang-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', btns[i].textContent.toLowerCase() === l);
+  }
+  // update landing texts
+  document.getElementById('landing-eyebrow').textContent = t.eyebrow;
+  document.getElementById('landing-title').innerHTML = t.title;
+  document.getElementById('landing-sub').textContent = t.sub;
+  document.getElementById('landing-footer').textContent = t.footer;
+  // update sector cards
+  var sectorIds = Object.keys(t.sectors);
+  for (var j = 0; j < sectorIds.length; j++) {
+    var sid = sectorIds[j];
+    var el = document.getElementById('sector-card-' + sid);
+    if (!el) continue;
+    el.querySelector('.sector-name').textContent = t.sectors[sid].name;
+    el.querySelector('.sector-desc').textContent = t.sectors[sid].desc;
+    el.querySelector('.sector-count span').nextSibling.nodeValue = ' ' + t.recursos;
+  }
+}
+
 // ══ STATE ══
 let currentSector=null, activeCat='Todos', activeType='Todos', activeTags=[];
+
+// ══ DATA ══
+var ITEMS = [];
+var DATA_URL = 'https://raw.githubusercontent.com/MateoAmbroggio/strategy-sales-hub/main/data.json';
+
+function mapIndustryToSector(industry) {
+  if (!industry) return null;
+  var val = typeof industry === 'object' ? industry.Value : industry;
+  if (!val) return null;
+  val = val.toLowerCase();
+  if (val.indexOf('financial') !== -1) return 'fsi';
+  if (val.indexOf('retail') !== -1) return 'retail';
+  return null;
+}
+
+function mapItem(raw, index) {
+  var sector = mapIndustryToSector(raw.Industry);
+  if (!sector) return null;
+  var tags = raw.Tags ? raw.Tags.split(',').map(function(t){ return t.trim(); }) : [];
+  var metrics = [];
+  if (raw.KeyMetrics) {
+    var lines = raw.KeyMetrics.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      var parts = lines[i].split('|');
+      if (parts.length === 2) {
+        metrics.push({ v: parts[0].trim(), l: parts[1].trim() });
+      }
+    }
+  }
+  return {
+    id: raw.ID || index,
+    sector: sector,
+    cat: raw.Category || 'General',
+    type: raw.ContentType || 'Caso de Uso',
+    company: raw.Company || '',
+    title: raw.Title || '',
+    summary: raw.Summary || raw.Description || '',
+    value: raw.BusinessValue || '',
+    tags: tags,
+    metrics: metrics,
+    internal: raw.IsInternal === true || raw.IsInternal === 'true',
+    links: raw['{Link}'] ? [{ label: 'Ver en Microsoft Lists', url: raw['{Link}'] }] : [],
+    bar: sector === 'fsi' ? 'linear-gradient(90deg,#4d8aff,transparent)' : 'linear-gradient(90deg,#f26522,transparent)',
+    extraTitle: raw.ExtraContentTitle || '',
+    extraContent: raw.ExtraContent || ''
+  };
+}
+
+function loadData(callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', DATA_URL + '?t=' + Date.now(), true);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        try {
+          var raw = JSON.parse(xhr.responseText);
+          var mapped = [];
+          for (var i = 0; i < raw.length; i++) {
+            var item = mapItem(raw[i], i + 1);
+            if (item) mapped.push(item);
+          }
+          ITEMS = mapped;
+        } catch(e) {
+          console.error('Error parsing data.json', e);
+        }
+      }
+      if (callback) callback();
+    }
+  };
+  xhr.send();
+}
+
+function updateSectorCounts() {
+  var sectorIds = Object.keys(SECTORS);
+  for (var i = 0; i < sectorIds.length; i++) {
+    var sid = sectorIds[i];
+    var count = ITEMS.filter(function(item){ return item.sector === sid; }).length;
+    var card = document.getElementById('sector-card-' + sid);
+    if (card) {
+      var span = card.querySelector('.sector-count span');
+      if (span) span.textContent = count;
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadData(function() {
+    updateSectorCounts();
+  });
+});
 
 // ══ NAVIGATION ══
 function goSector(id){
@@ -407,10 +589,14 @@ function goSector(id){
   document.getElementById('sector-name-d').textContent=s.label;
   document.getElementById('hero-eye').textContent=s.icon+'  '+s.label;
   document.getElementById('mobile-sector-label').textContent=s.icon+' '+s.label;
-  buildSidebar(); render();
   document.getElementById('landing').classList.remove('active');
   document.getElementById('hub').classList.add('active');
   window.scrollTo(0,0);
+  loadData(function(){
+    updateSectorCounts();
+    buildSidebar();
+    render();
+  });
 }
 function goLanding(){
   document.getElementById('hub').classList.remove('active');
@@ -545,11 +731,11 @@ function openModal(id){
         ${item.subcases.map(sc=>`<div class="subcase-box"><div class="subcase-title">${sc.title}</div><ul class="subcase-bullets">${sc.bullets.map(b=>`<li>${b}</li>`).join('')}</ul></div>`).join('')}
       </div>
     </div>`:'';
-  const qs=item.questions?.length?`
+  const extra=item.extraTitle&&item.extraContent?`
     <div>
-      <div class="ms-label">Preguntas clave que responde el agente</div>
+      <div class="ms-label">${item.extraTitle}</div>
       <div style="display:flex;flex-direction:column;gap:7px">
-        ${item.questions.map(qg=>`<div class="q-group"><div class="q-group-header">${qg.group}</div><ul class="q-list">${qg.qs.map(q=>`<li>${q}</li>`).join('')}</ul></div>`).join('')}
+        ${item.extraContent.split('\n').filter(function(l){return l.trim();}).map(function(l){return '<p class="modal-summary">'+l+'</p>';}).join('')}
       </div>
     </div>`:'';
 
@@ -570,7 +756,7 @@ function openModal(id){
       <div><div class="ms-label">Valor de negocio</div><p class="modal-summary" style="font-style:italic">${item.value}</p></div>
       ${item.metrics?.length?`<div class="modal-metrics">${item.metrics.map(m=>`<div><div class="mm-val">${m.v}</div><div class="mm-lbl">${m.l}</div></div>`).join('')}</div>`:''}
       ${item.quote?`<div class="modal-quote"><p>"${item.quote}"</p><div class="modal-quote-attr">${item.quoteAuthor}</div></div>`:''}
-      ${sub}${qs}
+      ${sub}${extra}
       <div><div class="ms-label">Tags</div><div class="modal-tags-row">${item.tags.map(t=>`<span class="modal-tag">${t}</span>`).join('')}</div></div>
       ${item.links?.length?`<div><div class="ms-label">Recursos</div><div class="modal-links">${item.links.map(l=>`<a class="ext-link" href="${l.url}" target="_blank" rel="noreferrer">${l.label} ↗</a>`).join('')}</div></div>`:''}
     </div>`;
